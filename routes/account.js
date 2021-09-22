@@ -5,6 +5,8 @@ const Mailgun = require('mailgun-js');
 const Item = require('../models/Item');
 const User = require('../models/User');
 
+const bcrypt = require('bcryptjs')
+
 const randomString = (length) => {
     let text = '';
     const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -93,12 +95,13 @@ router.post('/resetpassword', (req, res, next) => {
             if (err)
                 return next(err);
             // success:
-	        console.log(data);
-            res.json({
-                confirmation: 'success',
-                data: 'reset password endpoint',
-                user: user
-            });
+	        // console.log(data);
+            // res.json({
+            //     confirmation: 'success',
+            //     data: 'reset password endpoint',
+            //     user: user
+            // });
+            res.redirect('/')
         });
     });
 });
@@ -135,11 +138,66 @@ router.get('/password-reset', (req, res, next) => {
         if (seconds > 24*60*60){
             return next(new Error('Invalid Request'));
         }
+
+        // render the page where users can reset password
+        const data = {
+            id: user_id,
+            nonce: nonce
+        }
+        res.render('password-reset', data)
         
-        res.json({
-            user: user,
-            diff: seconds
-        })
+        // res.json({
+        //     user: user,
+        //     diff: seconds
+        // });
+    });
+});
+
+router.post('/newpassword', (req, res, next) => {
+    const password1 = req.body.password1
+    if (password1 == null){
+        return next(new Error('Invalid Request'));
+    }
+    const password2 = req.body.password2;
+    if (password2 == null){
+        return next(new Error('Invalid Request'));
+    }  
+    const nonce = req.body.nonce;
+    if (nonce == null){
+        return next(new Error('Invalid Request'));  
+    }
+    const user_id = req.body.id;
+    if (user_id == null){
+        return next(new Error('Invalid Request'));
+    }
+
+    if (password1 != password2){
+        return next(new Error('Passwords do not match')); 
+    }
+
+    User.findById(user_id, (err, user) => {
+        if (err)
+            return next(err);
+        if (user.passwordResetTime == null){
+            return next(new Error('Invalid Request'));
+        }
+        if (user.nonce == null){
+            return next(new Error('Invalid Request'));
+        }
+        if (nonce != user.nonce){
+            return next(new Error('Invalid Request'));
+        }
+        const now = new Date();
+        const diff = now - user.passwordResetTime; // time in milliseconds
+        const seconds = diff/1000;
+        if (seconds > 24*60*60){
+            return next(new Error('Invalid Request'));
+        }
+
+        const hashedPw = bcrypt.hashSync(password1, 10)
+        user.password = hashedPw
+        user.save()
+        res.redirect('/')
     });
 });
 
