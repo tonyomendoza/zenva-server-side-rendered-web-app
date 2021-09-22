@@ -1,6 +1,7 @@
 // requires and imports
 const express = require('express');
 const path = require('path');
+const mongoose = require('mongoose');
 
 // Import routes
 const home = require('./routes/home'); // Importing the home route
@@ -23,6 +24,13 @@ app.use(express.urlencoded({extended: false}));
 app.use('/', home);
 app.use('/register', register);
 
-// Start App
-app.listen(5000);
-console.log('App running on http://localhost:5000');
+mongoose.connect('mongodb://localhost/zenva-server-store', (err, data) => {
+  if (err){
+    console.log('DB Connection Failed');
+    return;
+  }
+  console.log('DB Connection Success');
+  // Start App
+  app.listen(5000);
+  console.log('App running on http://localhost:5000');
+})
