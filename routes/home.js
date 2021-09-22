@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
+// default
 router.get('/', (req, res, next) => {
-    res.send('This is from the home router!');
-})
+    res.render('home', null)
+  })
 
 module.exports = router;
