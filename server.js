@@ -26,6 +26,11 @@ app.use('/', home);
 app.use('/register', register);
 app.use('/login', login);
 
+app.use((err, req, res, next) => {
+    console.log('ERROR: ' + err);
+    res.render('error', {message: err.message});
+  })
+
 mongoose.connect('mongodb://localhost/zenva-server-store', (err, data) => {
   if (err){
     console.log('DB Connection Failed');

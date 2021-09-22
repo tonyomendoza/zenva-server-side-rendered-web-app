@@ -5,11 +5,7 @@ const User = require('../models/User');
 router.post('/', (req, res, next) => {
     User.create(req.body, (err, user) => {
         if (err){
-            res.json({
-                confirmation: 'fail',
-                error: err
-            })
-            return;
+            return next(err) //We receive an actual error here
         }
         res.json({
             confirmation: 'success',
