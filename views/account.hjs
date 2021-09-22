@@ -45,6 +45,16 @@
                 </div>
                 <div class="col-4">
                     <h3>My Items</h3>
+                    <ol>
+                        {{#interested}}
+                        <li>
+                            <div class="item">
+                                {{name}}<br />
+                                <a class="btn btn-success" href="#">Add</a>
+                            </div>
+                        </li>
+                        {{/interested}}
+                    </ol>
                 </div>
             </div>
         </div>
