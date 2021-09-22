@@ -1,3 +1,7 @@
+require('dotenv').config();
+
+console.log(process.env);
+
 // requires and imports
 const express = require('express');
 const path = require('path');
@@ -34,17 +38,17 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 
+app.use((err, req, res, next) => {
+    console.log('ERROR: ' + err);
+    res.render('error', {message: err.message});
+  })
+
 // Set routes
 app.use('/', home);
 app.use('/register', register);
 app.use('/login', login);
 app.use('/account', account);
 app.use('/admin', admin);
-
-app.use((err, req, res, next) => {
-    console.log('ERROR: ' + err);
-    res.render('error', {message: err.message});
-  })
 
 mongoose.connect('mongodb://localhost/zenva-server-store', (err, data) => {
   if (err){

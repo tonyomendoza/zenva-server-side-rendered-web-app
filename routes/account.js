@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const Mailgun = require('mailgun-js');
 
 const Item = require('../models/Item');
 const User = require('../models/User');
@@ -72,10 +73,32 @@ router.post('/resetpassword', (req, res, next) => {
         user.passwordResetTime = new Date();
         user.save();
 
-        res.json({
-            confirmation: 'success',
-            data: 'reset password endpoint',
-            user: user
+        const mailgun = Mailgun({
+            apiKey: process.env.MAILGUN_API_KEY,
+            domain: process.env.MAILGUN_DOMAIN
+        });
+
+        console.log(mailgun);
+
+        const data = {
+            to: req.body.email,
+            from: process.env.EMAIL,
+            sender: 'Sample Store',
+            subject: 'Password Reset Request',
+            html: 'Please click <a style="color:red" href="http://localhost:5000/account/password-reset?nonce='+user.nonce+'&id='+user._id+'">HERE</a> to reset your password. This link is valid for 24 hours.'
+
+        };
+
+        mailgun.messages().send(data, (err, body) => {
+            if (err)
+                return next(err);
+            // success:
+	        console.log(data);
+            res.json({
+                confirmation: 'success',
+                data: 'reset password endpoint',
+                user: user
+            });
         });
     });
 });
