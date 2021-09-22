@@ -18,18 +18,40 @@ module.exports = (passport) => {
         }, (req, email, password, next) => {
         User.findOne({email: email}, (err, user) => {
             if (err){
-                return next(err)
+                return next(err);
             }
             // user not found:
             if (user == null)
-                return next(new Error('User Not Found'))
+                return next(new Error('User Not Found'));
             // check password:
             if (user.password != req.body.password){
-                return next(new Error('Incorrect Password'))
+                return next(new Error('Incorrect Password'));
             }
-            return next(null, user)
+            return next(null, user);
         });
     });
 
     passport.use('localLogin', localLogin);
+
+    const localRegister = new LocalStrategy({
+        usernameField: 'email',
+        passwordField: 'password',
+        passReqToCallback: true
+    }, (req, email, password, next) => {
+        User.findOne({email: email}, (err, user) => {
+            if (err){
+                return next(err);
+            }
+            if (user != null)
+                return next(new Error('User already exists, please log in.'));
+
+            User.create({email:email, password:password}, (err, user) => {
+                if (err)
+                    return next(err);
+                next(null, user);
+            });
+        });
+    });
+
+    passport.use('localRegister', localRegister);
 };
