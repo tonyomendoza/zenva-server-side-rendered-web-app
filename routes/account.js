@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
-// temporary objects
 const Item = require('../models/Item');
+const User = require('../models/User')
+
 
 // default
 router.get('/', (req, res, next) => {
@@ -51,6 +52,18 @@ router.get('/additem/:itemid', (req, res, next) => {
             res.redirect('/account')
         }
     });
-})
+});
+
+router.post('/resetpassword', (req, res, next) => {
+    User.findOne({email: req.body.email}, (err, user) => {
+        if (err)
+            return next(err);
+        res.json({
+            confirmation: 'success',
+            data: 'reset password endpoint',
+            user: user
+        });
+    });
+});
 
 module.exports = router;
