@@ -2,6 +2,7 @@
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
+const login = require('./routes/login');
 
 // Import routes
 const home = require('./routes/home'); // Importing the home route
@@ -23,6 +24,7 @@ app.use(express.urlencoded({extended: false}));
 // Set routes
 app.use('/', home);
 app.use('/register', register);
+app.use('/login', login);
 
 mongoose.connect('mongodb://localhost/zenva-server-store', (err, data) => {
   if (err){
