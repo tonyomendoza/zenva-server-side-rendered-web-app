@@ -12,7 +12,7 @@ const home = require('./routes/home'); // Importing the home route
 const register = require('./routes/register'); //Importing the register route
 const login = require('./routes/login');
 const account = require('./routes/account') //Import the account route
-
+const admin = require('./routes/admin')
 
 // Initialize App
 const app = express();
@@ -38,7 +38,8 @@ app.use(express.urlencoded({extended: false}));
 app.use('/', home);
 app.use('/register', register);
 app.use('/login', login);
-app.use('/account', account)
+app.use('/account', account);
+app.use('/admin', admin);
 
 app.use((err, req, res, next) => {
     console.log('ERROR: ' + err);
