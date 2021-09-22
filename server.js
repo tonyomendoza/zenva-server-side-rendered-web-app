@@ -2,14 +2,27 @@
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
-const login = require('./routes/login');
+const passport = require('passport');
+const session = require('express-session');
+
+const auth = require('./config/auth')(passport) //Import auth.js
 
 // Import routes
 const home = require('./routes/home'); // Importing the home route
 const register = require('./routes/register'); //Importing the register route
+const login = require('./routes/login');
+const account = require('./routes/account') //Import the account route
+
 
 // Initialize App
 const app = express();
+app.use(session({
+    secret: 'awehfuilawef',
+    resave: true,
+    saveUninitialized: true
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Set the render engine
 app.set('views', path.join(__dirname, 'views'));
@@ -25,6 +38,7 @@ app.use(express.urlencoded({extended: false}));
 app.use('/', home);
 app.use('/register', register);
 app.use('/login', login);
+app.use('/account', account)
 
 app.use((err, req, res, next) => {
     console.log('ERROR: ' + err);
